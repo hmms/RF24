@@ -25,7 +25,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-extern HardwareSPI SPI;
+//extern HardwareSPI SPI;
 #define _BV(x) (1<<(x))
 #endif
 
@@ -50,6 +50,21 @@ extern HardwareSPI SPI;
 #ifdef ARDUINO
 #include <avr/pgmspace.h>
 #define PRIPSTR "%S"
+#elif defined(STELLARIS)
+extern "C"{
+#include "../utils/uartstdio.h"
+extern uint32_t millis();
+#define printf_P UARTprintf
+#include "spi.h"
+}
+#define LOW 0
+#define HIGH 1
+typedef uint16_t prog_uint16_t;
+#define PSTR(x) (x)
+#define strlen_P strlen
+#define PROGMEM
+#define pgm_read_word(p) (*(p))
+#define PRIPSTR "%s"
 #else
 typedef char const char;
 typedef uint16_t prog_uint16_t;
@@ -59,6 +74,20 @@ typedef uint16_t prog_uint16_t;
 #define PROGMEM
 #define pgm_read_word(p) (*(p)) 
 #define PRIPSTR "%s"
+#endif
+
+#ifndef ARDUINO
+
+#define max(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _a : _b; })
+
+#define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+
 #endif
 
 #endif // __RF24_CONFIG_H__
